@@ -28,6 +28,7 @@ export default class GameView {
     ready() {
         // Show everything when ready
         DomHelper.showAllContent();
+        var e = document.createEvent('HTMLEvents');
     }
 
     setKillMessageWithTimer(message) {

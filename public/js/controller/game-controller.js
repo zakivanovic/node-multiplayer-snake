@@ -28,6 +28,9 @@ export default class GameController {
         this.food = {};
         this.textsToDraw = [];
         this.walls = [];
+        this.mp;
+        this.cf;
+
     }
 
     connect(io) {
@@ -44,6 +47,17 @@ export default class GameController {
             if ({}.hasOwnProperty.call(this.food, foodId)) {
                 const food = this.food[foodId];
                 this.canvasView.drawSquare(food.coordinate, food.color);
+
+                if(this.mp) {
+                    if(!this.cf || (
+                                    Math.abs(this.mp.segments[0].x - food.coordinate.x) + Math.abs(this.mp.segments[0].y - food.coordinate.y)
+                                    <
+                                    Math.abs(this.mp.segments[0].x - this.cf.coordinate.x) + Math.abs(this.mp.segments[0].y - this.cf.coordinate.y)
+                                    )
+                      ) {
+                        this.cf = food;
+                    }
+                }
             }
         }
 
@@ -52,6 +66,11 @@ export default class GameController {
         for (const player of this.players) {
             if (player.segments.length === 0) {
                 continue;
+            }
+
+            
+            if (this.socket.id === player.id) {
+                this.mp = player;
             }
             // Flash around where you have just spawned
             if (`/#${this.socket.id}` === player.id &&
@@ -82,6 +101,7 @@ export default class GameController {
         setTimeout(() => {
             requestAnimationFrame(self.renderGame.bind(self));
         }, 1000 / ClientConfig.FPS);
+        this.makeTheMove();
     }
 
     /*******************
@@ -223,5 +243,35 @@ export default class GameController {
             this.audioController.playDeathSound.bind(this.audioController));
         this.socket.on(ClientConfig.IO.INCOMING.NOTIFICATION.YOU_MADE_A_KILL,
             this.audioController.playKillSound.bind(this.audioController));
+    }
+
+    sendMoveEvent(code) {
+        var e = new Event("keydown");
+        e.keyCode = code;
+        document.dispatchEvent(e);
+    }
+
+    makeTheMove() {
+        if (this.mp && this.cf) {
+            if (this.mp.segments[0].y == this.cf.coordinate.y && this.mp.segments[0].x == this.cf.coordinate.x) {
+                this.cf = null;
+                return;
+            }
+
+            this.canvasView.drawSquare(this.cf.coordinate, "white");
+            if (this.mp.segments[0].x > this.cf.coordinate.x) {
+                this.sendMoveEvent(37);
+            } else if (this.mp.segments[0].x < this.cf.coordinate.x) {
+                this.sendMoveEvent(39);
+            }
+
+            if (this.mp.segments[0].y > this.cf.coordinate.y) {
+                this.sendMoveEvent(38);
+            } else if (this.mp.segments[0].y < this.cf.coordinate.y) {
+                this.sendMoveEvent(40);
+            }
+
+
+        }
     }
 }
