@@ -10,9 +10,9 @@ const DOWN_ARROW_KEYCODE = 40;
  * Handles all requests related to the display of the game, not including the canvas
  */
 export default class GameView {
-    constructor(backgroundImageUploadCallback, botChangeCallback, foodChangeCallback, imageUploadCallback,
+    constructor(backgroundImageUploadCallback, imageUploadCallback,
         joinGameCallback, keyDownCallback, muteAudioCallback, playerColorChangeCallback, playerNameUpdatedCallback,
-        spectateGameCallback, speedChangeCallback, startLengthChangeCallback, toggleGridLinesCallback) {
+        spectateGameCallback, toggleGridLinesCallback) {
         this.isChangingName = false;
         this.backgroundImageUploadCallback = backgroundImageUploadCallback;
         this.imageUploadCallback = imageUploadCallback;
@@ -21,8 +21,7 @@ export default class GameView {
         this.muteAudioCallback = muteAudioCallback;
         this.playerNameUpdatedCallback = playerNameUpdatedCallback;
         this.spectateGameCallback = spectateGameCallback;
-        this._initEventHandling(botChangeCallback, foodChangeCallback, muteAudioCallback, playerColorChangeCallback,
-            speedChangeCallback, startLengthChangeCallback, toggleGridLinesCallback);
+        this._initEventHandling(muteAudioCallback, playerColorChangeCallback, toggleGridLinesCallback);
     }
 
     ready() {
@@ -47,10 +46,6 @@ export default class GameView {
             text = 'Mute';
         }
         DomHelper.setToggleSoundButtonText(text);
-    }
-
-    showFoodAmount(foodAmount) {
-        DomHelper.setCurrentFoodAmountLabelText(foodAmount);
     }
 
     showKillMessage(killerName, victimName, killerColor, victimColor, victimLength) {
@@ -82,10 +77,6 @@ export default class GameView {
         notificationDiv.innerHTML = formattedNotification + notificationDiv.innerHTML;
     }
 
-    showNumberOfBots(numberOfBots) {
-        DomHelper.setCurrentNumberOfBotsLabelText(numberOfBots);
-    }
-
     showPlayerStats(playerStats) {
         let formattedScores = '<div class="player-stats-header"><span class="image"></span>' +
             '<span class="name">Name</span>' +
@@ -106,14 +97,6 @@ export default class GameView {
                 `<span class='stat'>${playerStat.deaths}</span></div>`;
         }
         DomHelper.setPlayerStatsDivText(formattedScores);
-    }
-
-    showSpeed(speed) {
-        DomHelper.setCurrentSpeedLabelText(speed);
-    }
-
-    showStartLength(startLength) {
-        DomHelper.setCurrentStartLengthLabelText(startLength);
     }
 
     updatePlayerName(playerName, playerColor) {
@@ -207,8 +190,7 @@ export default class GameView {
         }
     }
 
-    _initEventHandling(botChangeCallback, foodChangeCallback, muteAudioCallback, playerColorChangeCallback, speedChangeCallback,
-        startLengthChangeCallback, toggleGridLinesCallback) {
+    _initEventHandling(muteAudioCallback, playerColorChangeCallback, toggleGridLinesCallback) {
         // Player controls
         DomHelper.getChangeColorButton().addEventListener('click', playerColorChangeCallback);
         DomHelper.getChangeNameButton().addEventListener('click', this._handleChangeNameButtonClick.bind(this));
@@ -222,31 +204,5 @@ export default class GameView {
         DomHelper.getToggleSoundButton().addEventListener('click', muteAudioCallback);
         DomHelper.getFullScreenButton().addEventListener('click', DomHelper.toggleFullScreenMode);
         window.addEventListener('keydown', this._handleKeyDown.bind(this), true);
-
-        // Admin controls
-        DomHelper.getIncreaseBotsButton().addEventListener('click',
-            botChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.INCREASE));
-        DomHelper.getDecreaseBotsButton().addEventListener('click',
-            botChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.DECREASE));
-        DomHelper.getResetBotsButton().addEventListener('click',
-            botChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.RESET));
-        DomHelper.getIncreaseFoodButton().addEventListener('click',
-            foodChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.INCREASE));
-        DomHelper.getDecreaseFoodButton().addEventListener('click',
-            foodChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.DECREASE));
-        DomHelper.getResetFoodButton().addEventListener('click',
-            foodChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.RESET));
-        DomHelper.getIncreaseSpeedButton().addEventListener('click',
-            speedChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.INCREASE));
-        DomHelper.getDecreaseSpeedButton().addEventListener('click',
-            speedChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.DECREASE));
-        DomHelper.getResetSpeedButton().addEventListener('click',
-            speedChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.RESET));
-        DomHelper.getIncreaseStartLengthButton().addEventListener('click',
-            startLengthChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.INCREASE));
-        DomHelper.getDecreaseStartLengthButton().addEventListener('click',
-            startLengthChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.DECREASE));
-        DomHelper.getResetStartLengthButton().addEventListener('click',
-            startLengthChangeCallback.bind(this, ClientConfig.INCREMENT_CHANGE.RESET));
     }
 }

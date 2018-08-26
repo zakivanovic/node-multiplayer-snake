@@ -10,8 +10,6 @@ import GameView from '../view/game-view.js';
 export default class GameController {
     constructor() {
         this.gameView = new GameView(this.backgroundImageUploadCallback.bind(this),
-                                     this.botChangeCallback.bind(this),
-                                     this.foodChangeCallback.bind(this),
                                      this.imageUploadCallback.bind(this),
                                      this.joinGameCallback.bind(this),
                                      this.keyDownCallback.bind(this),
@@ -19,8 +17,6 @@ export default class GameController {
                                      this.playerColorChangeCallback.bind(this),
                                      this.playerNameUpdatedCallback.bind(this),
                                      this.spectateGameCallback.bind(this),
-                                     this.speedChangeCallback.bind(this),
-                                     this.startLengthChangeCallback.bind(this),
                                      this.toggleGridLinesCallback.bind(this)
                                      );
         this.audioController = new AudioController();
@@ -31,7 +27,8 @@ export default class GameController {
     }
 
     connect(io) {
-        this.socket = io();
+        //this.socket = io();
+        this.socket = io.connect("https://battle-codes-01.herokuapp.com");
         this._initializeSocketIoHandlers();
         const storedName = localStorage.getItem(ClientConfig.LOCAL_STORAGE.PLAYER_NAME);
         const storedBase64Image = localStorage.getItem(ClientConfig.LOCAL_STORAGE.PLAYER_IMAGE);
@@ -87,14 +84,6 @@ export default class GameController {
     /*******************
      *  View Callbacks *
      *******************/
-
-    botChangeCallback(option) {
-        this.socket.emit(ClientConfig.IO.OUTGOING.BOT_CHANGE, option);
-    }
-
-    foodChangeCallback(option) {
-        this.socket.emit(ClientConfig.IO.OUTGOING.FOOD_CHANGE, option);
-    }
 
     backgroundImageUploadCallback(image, imageType) {
         if (!(image && imageType)) {
@@ -152,14 +141,6 @@ export default class GameController {
         this.socket.emit(ClientConfig.IO.OUTGOING.SPECTATE_GAME);
     }
 
-    speedChangeCallback(option) {
-        this.socket.emit(ClientConfig.IO.OUTGOING.SPEED_CHANGE, option);
-    }
-
-    startLengthChangeCallback(option) {
-        this.socket.emit(ClientConfig.IO.OUTGOING.START_LENGTH_CHANGE, option);
-    }
-
     toggleGridLinesCallback() {
         this.canvasView.toggleGridLines();
     }
@@ -198,10 +179,6 @@ export default class GameController {
         this.players = gameData.players;
         this.food = gameData.food;
         this.walls = gameData.walls;
-        this.gameView.showFoodAmount(Object.keys(gameData.food).length);
-        this.gameView.showSpeed(gameData.speed);
-        this.gameView.showStartLength(gameData.startLength);
-        this.gameView.showNumberOfBots(gameData.numberOfBots);
         this.gameView.showPlayerStats(gameData.playerStats);
     }
 
