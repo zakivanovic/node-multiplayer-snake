@@ -27,8 +27,7 @@ export default class GameController {
     }
 
     connect(io) {
-        //this.socket = io();
-        this.socket = io.connect("https://battle-codes-01.herokuapp.com");
+        this.socket = io(); // local server
         this._initializeSocketIoHandlers();
         const storedName = localStorage.getItem(ClientConfig.LOCAL_STORAGE.PLAYER_NAME);
         const storedBase64Image = localStorage.getItem(ClientConfig.LOCAL_STORAGE.PLAYER_IMAGE);

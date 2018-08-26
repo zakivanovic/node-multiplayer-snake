@@ -1,6 +1,5 @@
 'use strict';
 const path = require('path');
-const GameController = require('./app/controllers/game-controller');
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
@@ -17,10 +16,6 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
 app.get('/', (request, response) => {
     response.sendFile('game.html', { root: path.join(__dirname, 'app/views') });
 });
-
-// Create the main controller
-const gameController = new GameController();
-gameController.listen(io);
 
 const SERVER_PORT = process.env.PORT || 3000;
 app.set('port', SERVER_PORT);
