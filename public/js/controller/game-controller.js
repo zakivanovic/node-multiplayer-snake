@@ -55,7 +55,9 @@ export default class GameController {
                                     Math.abs(this.mp.segments[0].x - this.cf.coordinate.x) + Math.abs(this.mp.segments[0].y - this.cf.coordinate.y)
                                     )
                       ) {
-                        this.cf = food;
+                        if(!this.hasCollicions(food)) {
+                            this.cf = food;
+                        }
                     }
                 }
             }
@@ -270,8 +272,38 @@ export default class GameController {
             } else if (this.mp.segments[0].y < this.cf.coordinate.y) {
                 this.sendMoveEvent(40);
             }
-
-
         }
+    }
+
+    hasCollicions(food) {
+        if (this.mp && food) {
+            var player = JSON.parse(JSON.stringify(this.mp));
+            while(true) {
+                if (player.segments[0].y == food.coordinate.y && player.segments[0].x == food.coordinate.x) {
+                    return false;
+                }
+
+
+                for (let i = 1; i < player.segments.length; i++) {
+                    const seg = player.segments[i];
+                    if (seg.x == player.segments[0].x && seg.y == player.segments[0].y) {
+                        return true;
+                    }
+                }
+
+                if (player.segments[0].x > food.coordinate.x) {
+                    player.segments[0].x--;
+                } else if (player.segments[0].x < food.coordinate.x) {
+                    player.segments[0].x++;
+                }
+
+                if (player.segments[0].y > food.coordinate.y) {
+                    player.segments[0].y--;
+                } else if (player.segments[0].y < food.coordinate.y) {
+                    player.segments[0].y++;
+                }
+            }
+        }
+        return false;
     }
 }
