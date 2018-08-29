@@ -7,7 +7,7 @@
     "url": "https://github.com/simondiep/node-multiplayer-snake.git"
   },
   "scripts": {
-    "start": "forever --minUptime 100 --spinSleepTime 2000 -m 10 start app.js",
+    "start": "node app.js",
     "pretest": "eslint .",
     "test": "mocha",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha"
@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "express": "^4.14.0",
-    "forever": "^0.15.3",
     "less-middleware": "^2.1.0",
     "serve-favicon": "^2.3.0",
     "socket.io": "^1.4.6",
