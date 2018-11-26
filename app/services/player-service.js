@@ -37,7 +37,7 @@ class PlayerService {
         const newPlayer = this.createPlayer(socket.id, playerName);
         socket.emit(ServerConfig.IO.OUTGOING.NEW_PLAYER_INFO, playerName, newPlayer.color);
         socket.emit(ServerConfig.IO.OUTGOING.BOARD_INFO, Board);
-        this.notificationService.broadcastNotification(`${playerName} has joined!`, newPlayer.color);
+        this.notificationService.broadcastNotification(`${playerName} (${socket.id}) has joined!`, newPlayer.color);
         const backgroundImage = this.imageService.getBackgroundImage();
         if (backgroundImage) {
             socket.emit(ServerConfig.IO.OUTGOING.NEW_BACKGROUND_IMAGE, backgroundImage);
@@ -60,7 +60,7 @@ class PlayerService {
 
     createPlayer(id, name) {
         const player = new Player(id, name, this.colorService.getColor());
-        this.playerSpawnService.setupNewSpawn(player, this.getPlayerStartLength(), ServerConfig.SPAWN_TURN_LEEWAY);
+        this.playerSpawnService.setupNewSpawn(player, 1, ServerConfig.SPAWN_TURN_LEEWAY);
         this.playerContainer.addPlayer(player);
         this.playerStatBoard.addPlayer(player.id, player.name, player.color);
         return player;
@@ -178,7 +178,7 @@ class PlayerService {
         const player = this.playerContainer.getPlayer(playerId);
         this.playerContainer.removeSpectatingPlayerId(player.id);
         this.respawnPlayer(playerId);
-        this.notificationService.broadcastNotification(`${player.name} has rejoined the game.`, player.color);
+        this.notificationService.broadcastNotification(`${player.name} (${player.id}) has rejoined the game.`, player.color);
     }
 
     playerSpectateGame(playerId) {

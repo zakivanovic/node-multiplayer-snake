@@ -43,8 +43,8 @@ class GameController {
         this.notificationService.setSockets(io.sockets);
         const self = this;
         io.sockets.on(ServerConfig.IO.DEFAULT_CONNECTION, socket => {
-            socket.on(ServerConfig.IO.INCOMING.CANVAS_CLICKED, self._canvasClicked.bind(self, socket));
-            socket.on(ServerConfig.IO.INCOMING.KEY_DOWN, self._keyDown.bind(self, socket.id));
+            //socket.on(ServerConfig.IO.INCOMING.CANVAS_CLICKED, self._canvasClicked.bind(self, socket));
+            //socket.on(ServerConfig.IO.INCOMING.KEY_DOWN, self._keyDown.bind(self, socket.id));
 
             // Player Service
             socket.on(ServerConfig.IO.INCOMING.NEW_PLAYER,
@@ -94,17 +94,8 @@ class GameController {
             return;
         }
 
-        // Change bots' directions
-        for (const botId of this.adminService.getBotIds()) {
-            const bot = this.playerContainer.getPlayer(botId);
-            if (Math.random() <= ServerConfig.BOT_CHANGE_DIRECTION_PERCENT) {
-                this.botDirectionService.changeToRandomDirection(bot);
-            }
-            this.botDirectionService.changeDirectionIfInDanger(bot);
-        }
-
-        this.playerService.movePlayers();
-        this.playerService.handlePlayerCollisions();
+        //this.playerService.movePlayers();
+        //this.playerService.handlePlayerCollisions();
         this.playerService.respawnPlayers();
 
         this.foodService.consumeAndRespawnFood(this.playerContainer);
