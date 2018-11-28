@@ -59,11 +59,11 @@ class FoodService {
             foodToRespawn++;
         }
 
-        this.generateFood(foodToRespawn);
+        //this.generateFood(foodToRespawn);
     }
 
     generateDefaultFood() {
-        this.generateFood(ServerConfig.FOOD.DEFAULT_AMOUNT);
+        //this.generateFood(ServerConfig.FOOD.DEFAULT_AMOUNT);
     }
 
     generateFood(amount) {

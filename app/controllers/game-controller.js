@@ -36,6 +36,11 @@ class GameController {
         this.adminService = new AdminService(this.playerContainer, this.foodService, this.nameService,
             this.notificationService, this.playerService);
         this.playerService.init(this.adminService.getPlayerStartLength.bind(this.adminService));
+
+        this.board = [];
+        for(var i=0; i<50; i++) {
+            this.board[i] = new Array(50);
+        }
     }
 
     // Listen for Socket IO events
@@ -59,6 +64,8 @@ class GameController {
                 self.playerService.playerSpectateGame.bind(self.playerService, socket.id));
             socket.on(ServerConfig.IO.INCOMING.DISCONNECT,
                 self.playerService.disconnectPlayer.bind(self.playerService, socket.id));
+            socket.on(ServerConfig.IO.INCOMING.DISCONNECT,
+                    self.removePlayer.bind(self, socket.id));
             // Image Service
             socket.on(ServerConfig.IO.INCOMING.CLEAR_UPLOADED_BACKGROUND_IMAGE,
                 self.imageService.clearBackgroundImage.bind(self.imageService, socket.id));
@@ -84,11 +91,11 @@ class GameController {
         // Pause and reset the game if there aren't any players
         if (this.playerContainer.getNumberOfPlayers() - this.adminService.getBotIds().length === 0) {
             console.log('Game Paused');
-            this.boardOccupancyService.initializeBoard();
+            //this.boardOccupancyService.initializeBoard();
             this.adminService.resetGame();
             this.nameService.reinitialize();
             this.imageService.resetBackgroundImage();
-            this.foodService.reinitialize();
+            //this.foodService.reinitialize();
             this.playerContainer.reinitialize();
             this.playerStatBoard.reinitialize();
             return;
@@ -112,6 +119,77 @@ class GameController {
         this.notificationService.broadcastGameState(gameState);
 
         setTimeout(this.runGameCycle.bind(this), 1000 / this.adminService.getGameSpeed());
+    }
+
+    removePlayer(playerId) {
+        for(let i = 0; i < this.board.length; ++i) {
+            for(let j = 0; j < this.board[i].length; ++j) {
+                if (this.board[i][j] == playerId) {
+                    this.board[i][j] = null;
+                }
+            }
+        }
+    }
+
+    /**
+     * capture block
+     * @param {*} playerId 
+     * @param {*} blockCoords 
+     */
+    capture(playerId, blockCoords) {
+        const player = this.playerContainer.getPlayer(playerId);
+
+        if(!player) throw Error('Invalid player ID');
+
+        if (this.isPossible(player._segments, blockCoords)) {
+            if (this.board[blockCoords.x][blockCoords.y]) {
+                return { message: 'Block already captured by enemy' };
+            }
+            this.board[blockCoords.x][blockCoords.y] = playerId;
+            player._segments.push(new Coordinate(blockCoords.x, blockCoords.y));
+            this.playerStatBoard.resetScore(playerId);
+            this.playerStatBoard.increaseScore(playerId, player._segments.length);
+            return { message: 'Block captured' };
+        } else {
+            return { message: 'Invalid Block' };
+        }
+    }
+
+    updateOtherPlayer(otherPlayerId, coords) {
+        const otherPlayer = this.playerContainer.getPlayer(otherPlayerId);
+        for(var j=0; j < otherPlayer.segments.length; ++j) {
+            const coord = otherPlayer.segments[j];
+            if(coord.x == coords[0] && coord.y == coords[1]) {
+                otherPlayer.segments.splice(j,1);
+                return;
+            }
+        }
+    }
+
+    isPossible(segments, blockCoords) {
+        const x = parseInt(blockCoords.x);
+        const y = parseInt(blockCoords.y);
+        if(x == 0 || x == 50 || y == 0|| y == 50) {
+            return false;
+        }
+        for(let i =0; i < segments.length; ++i) {
+            const seg = segments[i];
+            if(x == seg.x && y == seg.y) {
+                return false;
+            }
+        }
+        for(let i = 0; i < segments.length; ++i) {
+            const seg = segments[i];
+            if(
+                ((x + 1) == seg.x && y == seg.y) ||
+                ((x - 1) == seg.x && y == seg.y) ||
+                ((y + 1) == seg.y && x == seg.x) ||
+                ((y - 1) == seg.y && x == seg.x)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*******************************
