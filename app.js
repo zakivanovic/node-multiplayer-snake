@@ -21,7 +21,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
 /* Set request limits */
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 15 minutes
-    max: 8000 // limit each IP to 100 requests per windowMs
+    max: 9000 // limit each IP to 100 requests per windowMs
   });
    
   //  apply to all requests

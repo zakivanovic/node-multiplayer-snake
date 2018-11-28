@@ -1,0 +1,7 @@
+node:
+  build: .
+  tty: true
+  volumes:
+    - ./:/var/www/
+  ports:
+    - '19042:3000'

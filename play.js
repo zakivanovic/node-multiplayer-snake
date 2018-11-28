@@ -18,7 +18,7 @@ if (cluster.isMaster) {
 } else {
   function start() {
   // QPX REST API URL (I censored my api key)
-  const url = 'http://localhost:3000/capture';
+  const url = 'http://localhost:19042/capture';
 
   let cpt = 0;
 
@@ -32,7 +32,7 @@ if (cluster.isMaster) {
   const crd = ['x', 'y'];
   const step = [-1, 1];
 
-  let socket = require('socket.io-client')('http://localhost:3000');
+  let socket = require('socket.io-client')('http://localhost:19042');
 
   socket.on('connect', () => {
     socket.emit('new player', `Toto${process.pid}`, '');
